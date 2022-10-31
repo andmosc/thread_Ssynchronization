@@ -31,7 +31,13 @@ public class Main {
             executorService.shutdownNow();
         }
 
+        printMap();
 
+        long endTs = System.currentTimeMillis();
+        System.out.println("Time: " + (endTs - startTs) + "ms");
+    }
+
+    private static void printMap() {
         Set<Map.Entry<Integer, Integer>> entries = map.entrySet();
         entries.stream().sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
                 .limit(4)
@@ -46,10 +52,9 @@ public class Main {
                     }
                 });
         System.out.println("....");
-        long endTs = System.currentTimeMillis();
-        System.out.println("Time: " + (endTs - startTs) + "ms");
-
     }
+
+    
 
     public static void generateRoute(String letters, int length) {
         Random random = new Random();
