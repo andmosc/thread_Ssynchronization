@@ -2,7 +2,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +11,7 @@ public class Main {
     private static final Map<Integer, Integer> map = new TreeMap<>();
     static volatile boolean firstMess = true;
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public static void main(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(100);
 
         long startTs = System.currentTimeMillis();
@@ -67,7 +66,7 @@ public class Main {
             }
             route.append(letter);
         }
-        route.append(" - " + count);
+        route.append(" - ").append(count);
 
         synchronized (map) {
             map.merge(count, 1, Integer::sum);
