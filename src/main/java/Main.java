@@ -54,7 +54,6 @@ public class Main {
         System.out.println("....");
     }
 
-    
 
     public static void generateRoute(String letters, int length) {
         Random random = new Random();
@@ -71,11 +70,7 @@ public class Main {
         route.append(" - " + count);
 
         synchronized (map) {
-            if (map.containsKey(count)) {
-                map.put(count, map.get(count) + 1);
-            } else {
-                map.put(count, 1);
-            }
+            map.merge(count, 1, Integer::sum);
         }
     }
 }
