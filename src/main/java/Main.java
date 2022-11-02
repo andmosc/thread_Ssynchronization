@@ -1,7 +1,4 @@
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -10,30 +7,50 @@ public class Main {
 
     private static final Map<Integer, Integer> map = new TreeMap<>();
     static volatile boolean firstMess = true;
+    private static final int nThreads = 10;
+    private static final int lengthString = 500;
 
     public static void main(String[] args) {
-        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
 
         long startTs = System.currentTimeMillis();
 
+        Thread th1 = new Thread(() -> currentleader());
+        th1.start();
+
         for (int i = 0; i < 1_000_000; i++) {
-            executorService.execute(() -> generateRoute("RLRFR", 5000));
-            //generateRoute("RLRFR", 5000);
+            executorService.execute(() -> generateRoute("RLRFR", lengthString));
+            //generateRoute("RLRFR", 500);
         }
 
-        //One good way to shut down the ExecutorService (which is also recommended by Oracle)
+        executorService.shutdown();
         try {
-            if (!executorService.awaitTermination(100, TimeUnit.MILLISECONDS)) {
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
                 executorService.shutdownNow();
             }
         } catch (InterruptedException e) {
             executorService.shutdownNow();
         }
 
+        th1.interrupt();
         printMap();
+
 
         long endTs = System.currentTimeMillis();
         System.out.println("Time: " + (endTs - startTs) + "ms");
+    }
+
+    private static void currentleader() {
+        while (!Thread.interrupted()) {
+            synchronized (map) {
+                try {
+                    map.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                System.out.println("Max: " + Collections.max(map.values()));
+            }
+        }
     }
 
     private static void printMap() {
@@ -70,6 +87,7 @@ public class Main {
 
         synchronized (map) {
             map.merge(count, 1, Integer::sum);
+            map.notify();
         }
     }
 }
